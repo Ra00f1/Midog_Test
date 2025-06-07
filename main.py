@@ -10,7 +10,6 @@ import pandas as pd
 import torchstain
 import torch
 
-
 def data_visualization_test(data_path, results_path):
     """
     This script is used to visualize the data from the MIDOG++ dataset.
@@ -37,9 +36,11 @@ def data_visualization_test(data_path, results_path):
                 if annotation['image_id'] == image['id']:
                     print(annotation['category_id'])
                     print(annotation['bbox'])
-                    x, y, w, h = annotation['bbox']
-                    cv2.rectangle(slide, (int(x), int(y)), (int(x+w), int(y+h)), (255, 255, 0), 10)
-                    cv2.putText(slide, str(annotation['category_id']), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 7, (255, 0, 0), 30)
+                    x1, y1, x2, y2 = annotation['bbox']
+                    cv2.rectangle(slide, (int(x1), int(y1)), (int(x2), int(y2)), (255, 255, 0), 10)
+                    cv2.putText(slide, str(annotation['category_id']), (int(x1), int(y1) - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 5)
+
                     cv2.imwrite(os.path.join(results_path, image['file_name']), slide)
             plt.figure(figsize=(10, 10))
             plt.imshow(slide)
@@ -123,9 +124,6 @@ def Labling_and_patching_test(data_path, results_path):
         first = True
 
         for image in data['images']:
-            if first:
-                first = False
-                continue
             print(image['file_name'])
             slide = tifffile.imread(os.path.join(data_path, image['file_name']))
 
@@ -133,9 +131,10 @@ def Labling_and_patching_test(data_path, results_path):
                 if annotation['image_id'] == image['id']:
                     print(annotation['category_id'])
                     print(annotation['bbox'])
-                    x, y, w, h = annotation['bbox']
-                    cv2.rectangle(slide, (int(x), int(y)), (int(x+w), int(y+h)), (255, 255, 0), 20)
-                    cv2.putText(slide, str(annotation['category_id']), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 7, (255, 0, 0), 30)
+                    x1, y1, x2, y2 = annotation['bbox']
+                    cv2.rectangle(slide, (int(x1), int(y1)), (int(x2), int(y2)), (255, 255, 0), 10)
+                    cv2.putText(slide, str(annotation['category_id']), (int(x1), int(y1) - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 5)
                     cv2.imwrite(os.path.join(results_path, image['file_name']), slide)
             # draw boxes of 256x256 size on the image with 50% overlap simulating the patches but make the ones that have the bounding box in them red
             print(slide.shape)
@@ -148,13 +147,13 @@ def Labling_and_patching_test(data_path, results_path):
 
                     for annotation in data['annotations']:
                         if annotation['image_id'] == image['id']:
-                            x, y, w, h = annotation['bbox']
+                            x, y, x2, y2 = annotation['bbox']
 
                             # bounding box corners
                             box_x1 = x
                             box_y1 = y
-                            box_x2 = x + w
-                            box_y2 = y + h
+                            box_x2 = x2
+                            box_y2 = y2
 
                             # patch corners
                             patch_x1 = j
@@ -185,7 +184,7 @@ if __name__ == '__main__':
 
     database = results_path + '/MIDOG++.json'
 
-    # data_visualization_test(data_path, results_path)
+    data_visualization_test(data_path, results_path)
 
     # data_info(database)
 
